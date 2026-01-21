@@ -7,7 +7,11 @@
     "start": "node server.js",
     "dev": "node server.js"
   },
-  "keywords": ["express", "nodejs", "hackathon"],
+  "keywords": [
+    "express",
+    "nodejs",
+    "hackathon"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
