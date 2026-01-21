@@ -1,0 +1,16 @@
+{
+  "name": "hackathon-practice",
+  "version": "1.0.0",
+  "description": "Basic Node.js Express project for hackathon practice",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["express", "nodejs", "hackathon"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
