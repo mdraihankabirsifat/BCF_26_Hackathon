@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS LoyaltyTransactions (
     member_id INTEGER NOT NULL,
     coffee_id INTEGER,
     points_change INTEGER NOT NULL,
-    transaction_type VARCHAR(50) NOT NULL, -- 'earned' or 'spent'
+    transaction_type VARCHAR(50) NOT NULL, - 'earned' or 'spent'
     description TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (member_id) REFERENCES Members(member_id) ON DELETE CASCADE,
