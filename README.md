@@ -123,11 +123,52 @@ Returns the server health status.
 }
 ```
 
-### Create Coffee
+---
 
-**POST** `/coffees`
+### Coffee Management
 
-Creates a new coffee product in the database.
+#### GET `/coffees`
+
+Get all coffee products.
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "count": 2,
+  "data": [
+    {
+      "coffee_id": 1,
+      "name": "Espresso",
+      "description": "Strong Italian coffee",
+      "price": "3.50",
+      "category": "Hot",
+      "created_at": "2024-01-01T12:00:00.000Z"
+    }
+  ]
+}
+```
+
+#### GET `/coffees/:id`
+
+Get a specific coffee by ID.
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "coffee_id": 1,
+    "name": "Espresso",
+    "price": "3.50",
+    "category": "Hot"
+  }
+}
+```
+
+#### POST `/coffees`
+
+Create a new coffee product.
 
 **Request Body:**
 ```json
@@ -141,13 +182,13 @@ Creates a new coffee product in the database.
 
 **Required Fields:**
 - `name` (string): Name of the coffee product
-- `price` (number): Price of the coffee
+- `price` (number): Price of the coffee (must be non-negative)
 
 **Optional Fields:**
 - `description` (string): Description of the coffee
 - `category` (string): Category of the coffee
 
-**Success Response (201):**
+**Response (201):**
 ```json
 {
   "success": true,
@@ -155,32 +196,264 @@ Creates a new coffee product in the database.
   "data": {
     "coffee_id": 1,
     "name": "Espresso",
-    "description": "Strong Italian coffee",
     "price": "3.50",
-    "category": "Hot",
-    "created_at": "2024-01-01T12:00:00.000Z"
+    "category": "Hot"
   }
 }
 ```
 
-**Error Response (400):**
+#### PUT `/coffees/:id`
+
+Update a coffee product. All fields are optional - only provided fields will be updated.
+
+**Request Body:**
 ```json
 {
-  "error": "Missing required fields",
-  "message": "Name and price are required"
+  "name": "Updated Espresso",
+  "price": 4.00
 }
 ```
 
-**Example using cURL:**
-```bash
-curl -X POST http://localhost:8000/coffees \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Cappuccino",
-    "description": "Espresso with steamed milk foam",
-    "price": 4.50,
-    "category": "Hot"
-  }'
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Coffee updated successfully",
+  "data": {
+    "coffee_id": 1,
+    "name": "Updated Espresso",
+    "price": "4.00"
+  }
+}
+```
+
+#### DELETE `/coffees/:id`
+
+Delete a coffee product.
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Coffee deleted successfully",
+  "data": { ... }
+}
+```
+
+---
+
+### Member Management
+
+#### GET `/members`
+
+Get all registered members.
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "count": 1,
+  "data": [
+    {
+      "member_id": 1,
+      "name": "John Doe",
+      "email": "john@example.com",
+      "phone": "1234567890",
+      "loyalty_points": 5,
+      "created_at": "2024-01-01T12:00:00.000Z"
+    }
+  ]
+}
+```
+
+#### GET `/members/:id`
+
+Get a specific member by ID.
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "member_id": 1,
+    "name": "John Doe",
+    "email": "john@example.com",
+    "loyalty_points": 5
+  }
+}
+```
+
+#### POST `/members`
+
+Register a new member.
+
+**Request Body:**
+```json
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "phone": "1234567890"
+}
+```
+
+**Required Fields:**
+- `name` (string): Full name of the member
+- `email` (string): Email address (must be unique)
+
+**Optional Fields:**
+- `phone` (string): Phone number
+
+**Response (201):**
+```json
+{
+  "success": true,
+  "message": "Member registered successfully",
+  "data": {
+    "member_id": 1,
+    "name": "John Doe",
+    "email": "john@example.com",
+    "loyalty_points": 0
+  }
+}
+```
+
+---
+
+### Purchase & Bonus Points
+
+#### POST `/purchases`
+
+Process a purchase and calculate bonus points. **Business Rule: 1 point per 50 taka spent**
+
+**Request Body:**
+```json
+{
+  "member_id": 1,
+  "coffee_id": 1,
+  "quantity": 2
+}
+```
+
+**Required Fields:**
+- `member_id` (integer): ID of the member making the purchase
+- `coffee_id` (integer): ID of the coffee being purchased
+- `quantity` (integer, default: 1): Quantity of coffee items
+
+**Response (201):**
+```json
+{
+  "success": true,
+  "message": "Purchase processed successfully",
+  "data": {
+    "purchase": {
+      "member_id": 1,
+      "coffee_id": 1,
+      "coffee_name": "Espresso",
+      "quantity": 2,
+      "unit_price": 3.50,
+      "total_amount": 7.00
+    },
+    "bonus_points": {
+      "earned": 0,
+      "previous_balance": 5,
+      "new_balance": 5
+    },
+    "transaction": {
+      "transaction_id": 1,
+      "points_change": 0,
+      "transaction_type": "earned"
+    }
+  }
+}
+```
+
+**Note:** Points are calculated as `Math.floor(total_amount / 50)`. For example:
+- 50 taka = 1 point
+- 100 taka = 2 points
+- 149 taka = 2 points (floor division)
+
+---
+
+### Discount Redemption
+
+#### POST `/redeem`
+
+Redeem loyalty points for discount. **Business Rule: 1 point = 1 taka discount**
+
+**Request Body:**
+```json
+{
+  "member_id": 1,
+  "points_to_redeem": 5,
+  "purchase_amount": 20.00
+}
+```
+
+**Required Fields:**
+- `member_id` (integer): ID of the member redeeming points
+- `points_to_redeem` (integer): Number of points to redeem
+- `purchase_amount` (number): Original purchase amount before discount
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Points redeemed successfully",
+  "data": {
+    "redemption": {
+      "points_redeemed": 5,
+      "discount_amount": 5,
+      "original_amount": 20.00,
+      "final_amount": 15.00
+    },
+    "points": {
+      "previous_balance": 10,
+      "redeemed": 5,
+      "new_balance": 5
+    },
+    "transaction": {
+      "transaction_id": 2,
+      "points_change": -5,
+      "transaction_type": "spent"
+    }
+  }
+}
+```
+
+**Error Response (400) - Insufficient Points:**
+```json
+{
+  "error": "Insufficient points",
+  "message": "Member has 3 points, but trying to redeem 5 points"
+}
+```
+
+---
+
+### Transaction History
+
+#### GET `/members/:id/transactions`
+
+Get transaction history for a specific member.
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "count": 2,
+  "data": [
+    {
+      "transaction_id": 1,
+      "member_id": 1,
+      "coffee_id": 1,
+      "coffee_name": "Espresso",
+      "points_change": 2,
+      "transaction_type": "earned",
+      "description": "Purchase: 2x Espresso (100.00 taka)",
+      "created_at": "2024-01-01T12:00:00.000Z"
+    }
+  ]
+}
 ```
 
 ## 🗄️ Database Schema
