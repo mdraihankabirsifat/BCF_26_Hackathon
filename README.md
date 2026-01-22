@@ -15,11 +15,16 @@ A full-stack coffee shop management system built for a hackathon, featuring a No
 
 ## 🎯 Overview
 
-This project is a coffee shop management system that includes:
+This project is a coffee shop bonus point and discount system built for a hackathon. The system includes:
 - **Backend**: Node.js Express server running on port 8000
 - **Database**: PostgreSQL with automatic table initialization
 - **Containerization**: Docker Compose for easy deployment
-- **Features**: Coffee product management, member loyalty system, and transaction tracking
+- **Features**: 
+  - Coffee product management
+  - Member loyalty program
+  - Bonus point calculation (1 point per 50 taka spent)
+  - Discount calculation (1 point = 1 taka off)
+  - Transaction tracking
 
 ## 📁 Project Structure
 
@@ -28,7 +33,8 @@ prac_2/
 ├── database/
 │   └── Init.sql              # Database initialization script
 ├── docs/
-│   └── schemas.md            # Database schema documentation
+│   └── database/
+│       └── schemas.md        # Database schema documentation
 ├── server/
 │   ├── Dockerfile            # Node.js container configuration
 │   ├── package.json          # Node.js dependencies
@@ -52,9 +58,10 @@ docker-compose --version
 
 ## 🚀 Getting Started
 
-### 1. Clone/Navigate to the Project
+### 1. Clone the Repository
 
 ```bash
+git clone <repository-url>
 cd prac_2
 ```
 
@@ -63,8 +70,12 @@ cd prac_2
 Build and start both the database and server containers:
 
 ```bash
-docker-compose up --build
+docker compose up --build -d
 ```
+
+**Note**: The evaluation will test your submission using exactly these two commands:
+- `git clone <repository-url>`
+- `docker compose up --build -d`
 
 This command will:
 - Build the PostgreSQL database container
@@ -180,7 +191,7 @@ The database consists of three main tables:
 2. **Members**: Stores loyalty program member data
 3. **LoyaltyTransactions**: Tracks loyalty point transactions
 
-For detailed schema documentation, see [`docs/schemas.md`](docs/schemas.md).
+For detailed schema documentation, see [`docs/database/schemas.md`](docs/database/schemas.md).
 
 ### Quick Schema Overview
 
@@ -232,32 +243,32 @@ Default database credentials (configured in `docker-compose.yaml`):
 
 **Stop services:**
 ```bash
-docker-compose down
+docker compose down
 ```
 
 **Stop and remove volumes (clean database):**
 ```bash
-docker-compose down -v
+docker compose down -v
 ```
 
 **View logs:**
 ```bash
-docker-compose logs -f
+docker compose logs -f
 ```
 
 **View server logs only:**
 ```bash
-docker-compose logs -f server
+docker compose logs -f server
 ```
 
 **View database logs only:**
 ```bash
-docker-compose logs -f db
+docker compose logs -f db
 ```
 
 **Rebuild after code changes:**
 ```bash
-docker-compose up --build
+docker compose up --build -d
 ```
 
 ## 💻 Development
@@ -288,15 +299,19 @@ If you prefer to run the server locally:
 1. Edit files in the `server/` directory
 2. Rebuild the container:
    ```bash
-   docker-compose up --build
+   docker compose up --build -d
    ```
 
 ## 📝 Notes
 
-- The server runs on **port 8000** as specified
-- Database tables are automatically initialized when the database container starts
+- The server runs on **port 8000** as required for functional testing
+- Database tables are automatically initialized when the database container starts (empty tables only, no seed data)
 - The server waits for the database to be healthy before starting
-- All database credentials are configured in `docker-compose.yaml` (no `.env` files)
+- All database credentials are configured in `docker-compose.yaml` (no `.env` files as per requirements)
+- No authentication or authorization is implemented (as per test requirements)
+- The system supports:
+  - **Bonus Points**: Members earn 1 point for every 50 taka spent
+  - **Discounts**: 1 point can be redeemed for 1 taka discount
 
 ## 🐛 Troubleshooting
 
@@ -306,11 +321,24 @@ If you prefer to run the server locally:
 
 **Database connection errors:**
 - Wait for the database to fully initialize (check logs)
-- Verify the database container is running: `docker-compose ps`
+- Verify the database container is running: `docker compose ps`
 
 **Container build failures:**
 - Ensure Docker is running
-- Try: `docker-compose down` then `docker-compose up --build`
+- Try: `docker compose down` then `docker compose up --build -d`
+
+## 🎯 Hackathon Requirements
+
+This project is built for the **"Can't Spill the Beans"** hackathon challenge, which requires:
+
+- ✅ Reliable bonus point accumulation system
+- ✅ Accurate discount calculation
+- ✅ Database design with proper normalization
+- ✅ Full API implementation
+- ✅ Docker containerization
+- ✅ Automatic database initialization
+- ✅ Server running on port 8000
+- ✅ No authentication (for testing simplicity)
 
 ## 📄 License
 
